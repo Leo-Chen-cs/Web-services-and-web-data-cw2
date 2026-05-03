@@ -4,6 +4,15 @@
 > 截止日期：**2026年5月8日**
 > 提交内容：Minerva上提交一个PDF/TXT文件，包含视频链接、GitHub仓库URL、索引文件
 
+## 当前完成状态（2026-05-03）
+
+- 已完成代码实现：`crawler/indexer/search/main` 四个模块均已实现。
+- 已完成正式索引：`data/index.json`，包含 **213 pages / 4654 terms**，使用默认 6 秒 politeness window 构建。
+- 已完成测试：`30 passed`，`pytest-cov` 覆盖率 **96%**。
+- 已完成文档：`README.md`、`docs/video_script.md`、`docs/genai_reflection.md`。
+- 已完成 Git 提交：实现、测试、文档/索引已拆成有意义 commit。
+- 仍需你完成：录制 5 分钟内视频、上传到可访问平台、确认 GitHub 仓库 public，并在 Minerva 提交视频链接/GitHub URL/索引文件。
+
 ---
 
 ## 一、项目结构（严格按照作业要求）
