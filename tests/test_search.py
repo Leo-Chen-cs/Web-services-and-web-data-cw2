@@ -44,6 +44,60 @@ def test_multi_word_query_uses_and_logic(engine: SearchEngine) -> None:
     ]
 
 
+def test_quoted_phrase_query_requires_consecutive_positions() -> None:
+    index = build_index(
+        [
+            Page(
+                url="https://quotes.toscrape.com/phrase/",
+                title="Phrase",
+                text="Good friends are rare",
+            ),
+            Page(
+                url="https://quotes.toscrape.com/apart/",
+                title="Apart",
+                text="Good ideas and loyal friends are rare",
+            ),
+        ]
+    )
+    engine = SearchEngine(index)
+
+    phrase_results = engine.find(["good friends"])
+    and_results = engine.find(["good", "friends"])
+
+    assert [result.url for result in phrase_results] == [
+        "https://quotes.toscrape.com/phrase/"
+    ]
+    assert phrase_results[0].frequencies["good friends"] == 1
+    assert {result.url for result in and_results} == {
+        "https://quotes.toscrape.com/phrase/",
+        "https://quotes.toscrape.com/apart/",
+    }
+
+
+def test_phrase_query_can_combine_with_single_terms() -> None:
+    index = build_index(
+        [
+            Page(
+                url="https://quotes.toscrape.com/match/",
+                title="Match",
+                text="Good friends read books",
+            ),
+            Page(
+                url="https://quotes.toscrape.com/no-extra-term/",
+                title="No Extra Term",
+                text="Good friends travel",
+            ),
+        ]
+    )
+    engine = SearchEngine(index)
+
+    results = engine.find(["good friends", "books"])
+
+    assert [result.url for result in results] == [
+        "https://quotes.toscrape.com/match/"
+    ]
+
+
 def test_missing_and_empty_queries(engine: SearchEngine) -> None:
     assert engine.find(["missing"]) == []
     assert engine.find([]) == []

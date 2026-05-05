@@ -15,6 +15,7 @@ Demonstrate:
 > load
 > print life
 > find life love
+> find "good friends"
 > find missingword
 > find
 ```
@@ -32,8 +33,8 @@ Key points:
 - `Crawler.crawl` uses BFS, keeps visited URLs, and stays on the same host.
 - `_respect_politeness_window` enforces at least six seconds between requests.
 - `build_index` maps each token to URLs, frequencies, and positions.
-- `SearchEngine.find` intersects posting lists for AND queries and ranks with
-  TF-IDF.
+- `SearchEngine.find` intersects posting lists for AND queries, verifies quoted
+  phrase queries using token positions, and ranks with TF-IDF.
 - JSON was chosen because it is readable and easy to submit.
 
 ## 3:30-4:00 Tests
@@ -46,7 +47,8 @@ pytest --cov=src --cov-report=term-missing
 
 Explain that tests cover normal crawl behaviour, duplicate links, error
 recovery, politeness, indexing, positions, single-word search, multi-word search,
-missing terms, and CLI edge cases.
+phrase search, missing terms, and CLI edge cases. Mention that GitHub Actions
+runs the same test command automatically.
 
 ## 4:00-4:30 Git
 
@@ -57,7 +59,7 @@ git log --oneline
 ```
 
 Mention the implementation was developed in clear stages: crawler, index/search,
-tests, and documentation.
+tests, documentation, and high-scoring extras such as CI and benchmarking notes.
 
 ## 4:30-5:00 GenAI Reflection
 
@@ -69,5 +71,4 @@ State that AI was used to help plan, implement, and test. Give concrete examples
   politeness window or make tests wait in real time, so the final code injects
   `sleep_func` and `time_func` for fast tests.
 - Learning impact: checking the code improved understanding of BFS crawling,
-  inverted indexes, JSON persistence, and TF-IDF.
-
+  inverted indexes, JSON persistence, phrase matching, and TF-IDF.

@@ -31,6 +31,11 @@ Another issue was ranking. A basic answer might only return pages in arbitrary
 dictionary order. I added TF-IDF scoring so `find` returns more relevant pages
 first.
 
+I also added exact phrase search myself after reviewing the marking criteria.
+The existing index already stored token positions, so quoted queries such as
+`find "good friends"` can verify consecutive positions instead of only checking
+that both words appear somewhere on the same page.
+
 ## Quality And Correctness Checks
 
 I reviewed the generated ideas manually and verified them with `pytest`. The
@@ -50,3 +55,6 @@ AI improved time management by producing an initial structure quickly. The main
 risk was over-trusting generated code, so the workflow used tests and manual
 review to catch missing requirements before submission.
 
+Ethically, I treated AI as an assistant rather than an author. I declared its
+use, checked generated suggestions against the brief, and kept enough
+understanding to explain each implementation decision in the video.

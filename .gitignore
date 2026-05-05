@@ -1,6 +1,8 @@
 .coverage
+.DS_Store
 .pytest_cache/
 .venv/
 __pycache__/
 htmlcov/
 *.pyc
+XJCO3011_Coursework2_Brief__2025_2026.pdf

@@ -1,16 +1,17 @@
 # COMP3011 Coursework 2: Search Engine Tool — 完成规划清单
 
 > 目标：冲击 **80–100分（Excellent to Outstanding）**
-> 截止日期：**2026年5月8日**
+> 截止日期：**2026年5月12日**
 > 提交内容：Minerva上提交一个PDF/TXT文件，包含视频链接、GitHub仓库URL、索引文件
 
 ## 当前完成状态（2026-05-03）
 
 - 已完成代码实现：`crawler/indexer/search/main` 四个模块均已实现。
 - 已完成正式索引：`data/index.json`，包含 **213 pages / 4654 terms**，使用默认 6 秒 politeness window 构建。
-- 已完成测试：`30 passed`，`pytest-cov` 覆盖率 **96%**。
+- 已完成测试：`33 passed`，`pytest-cov` 覆盖率 **97%**。
 - 已完成文档：`README.md`、`docs/video_script.md`、`docs/genai_reflection.md`。
 - 已完成 Git 提交：实现、测试、文档/索引已拆成有意义 commit。
+- 已新增优化：exact phrase query、GitHub Actions CI、复杂度分析、benchmark 脚本。
 - 仍需你完成：录制 5 分钟内视频、上传到可访问平台、确认 GitHub 仓库 public，并在 Minerva 提交视频链接/GitHub URL/索引文件。
 
 ---
@@ -182,17 +183,17 @@ repository-name/
   - [ ] 视频演示链接（确认无痕浏览器可访问）
   - [ ] GitHub 仓库 URL（确认为 public）
   - [ ] 索引文件（作为附件上传，或提供下载链接）
-- [ ] 截止日期：**2026年5月8日**
+- [ ] 截止日期：**2026年5月12日**
 
 ---
 
 ## 十、加分项（冲80+分）
 
 - [ ] 实现 **TF-IDF 排名**，让 find 命令按相关性排序结果
-- [ ] 实现**高级查询处理**（如短语查询、通配符）
-- [ ] 实现**查询建议**（query suggestions）
-- [ ] 算法复杂度分析和性能基准测试（benchmarking）
-- [ ] 自动化测试流水线（GitHub Actions CI）
+- [x] 实现**高级查询处理**（如短语查询、通配符）
+- [x] 实现**查询建议**（query suggestions）
+- [x] 算法复杂度分析和性能基准测试（benchmarking）
+- [x] 自动化测试流水线（GitHub Actions CI）
 - [ ] 专业级 README（媲美开源项目）
 
 ---

@@ -80,6 +80,19 @@ def test_build_index_accepts_mapping_documents_and_empty_input() -> None:
     assert mapping_index["documents"]["https://quotes.toscrape.com/"]["length"] == 2
 
 
+def test_build_index_merges_extra_metadata() -> None:
+    index = build_index(
+        [Page(url="https://quotes.toscrape.com/", title="Home", text="Alpha")],
+        extra_metadata={
+            "base_url": "https://quotes.toscrape.com/",
+            "politeness_window_seconds": 6,
+        },
+    )
+
+    assert index["metadata"]["base_url"] == "https://quotes.toscrape.com/"
+    assert index["metadata"]["politeness_window_seconds"] == 6
+
+
 def test_build_index_rejects_missing_document_fields() -> None:
     with pytest.raises(ValueError, match="missing required fields"):
         build_index([{"url": "https://quotes.toscrape.com/", "title": "Home"}])

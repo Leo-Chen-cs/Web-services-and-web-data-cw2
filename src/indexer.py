@@ -22,7 +22,10 @@ def tokenize(text: str) -> list[str]:
     return [match.group(0).lower() for match in TOKEN_RE.finditer(text or "")]
 
 
-def build_index(documents: Iterable[Page | Mapping[str, str]]) -> dict[str, Any]:
+def build_index(
+    documents: Iterable[Page | Mapping[str, str]],
+    extra_metadata: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
     """Build an inverted index containing term frequency and positions."""
     docs_by_url: dict[str, dict[str, Any]] = {}
     postings: dict[str, dict[str, dict[str, Any]]] = defaultdict(dict)
@@ -56,13 +59,17 @@ def build_index(documents: Iterable[Page | Mapping[str, str]]) -> dict[str, Any]
         for term, term_postings in sorted(postings.items())
     }
 
+    metadata: dict[str, Any] = {
+        "schema_version": SCHEMA_VERSION,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "document_count": document_count,
+        "term_count": len(terms),
+    }
+    if extra_metadata:
+        metadata.update(dict(extra_metadata))
+
     return {
-        "metadata": {
-            "schema_version": SCHEMA_VERSION,
-            "created_at": datetime.now(timezone.utc).isoformat(),
-            "document_count": document_count,
-            "term_count": len(terms),
-        },
+        "metadata": metadata,
         "documents": dict(sorted(docs_by_url.items())),
         "terms": terms,
     }
@@ -129,4 +136,3 @@ def term_frequency_summary(index: Mapping[str, Any], term: str) -> Counter[str]:
             for url, posting in stats.get("postings", {}).items()
         }
     )
-

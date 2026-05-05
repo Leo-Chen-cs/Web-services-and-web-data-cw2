@@ -19,6 +19,19 @@ class SearchResult:
     frequencies: dict[str, int]
 
 
+@dataclass(frozen=True)
+class QueryGroup:
+    """A token group from a query; multi-token groups are phrase queries."""
+
+    raw: str
+    tokens: tuple[str, ...]
+
+    @property
+    def is_phrase(self) -> bool:
+        """Return whether this group should match consecutive positions."""
+        return len(self.tokens) > 1
+
+
 class SearchEngine:
     """Run AND queries over an inverted index with TF-IDF ranking."""
 
@@ -37,10 +50,11 @@ class SearchEngine:
     def find(self, raw_terms: list[str] | tuple[str, ...]) -> list[SearchResult]:
         """Find documents containing all query terms, ranked by TF-IDF score."""
         index = self._require_index()
-        terms = self._normalise_query(raw_terms)
-        if not terms:
+        groups = self._normalise_query(raw_terms)
+        if not groups:
             return []
 
+        terms = self._flatten_groups(groups)
         term_data = index.get("terms", {})
         if any(term not in term_data for term in terms):
             return []
@@ -56,6 +70,10 @@ class SearchEngine:
         documents = index.get("documents", {})
         results: list[SearchResult] = []
         for url in matching_urls:
+            phrase_counts = self._phrase_counts_for_url(groups, url, term_data)
+            if phrase_counts is None:
+                continue
+
             score = 0.0
             frequencies: dict[str, int] = {}
             for term in terms:
@@ -64,6 +82,7 @@ class SearchEngine:
                 frequency = int(posting["frequency"])
                 frequencies[term] = frequency
                 score += frequency * float(stats.get("idf", 1.0))
+            frequencies.update(phrase_counts)
 
             document = documents.get(url, {})
             results.append(
@@ -112,15 +131,67 @@ class SearchEngine:
         vocabulary = list(index.get("terms", {}).keys())
         return get_close_matches(tokens[0], vocabulary, n=limit, cutoff=0.75)
 
-    def _normalise_query(self, raw_terms: list[str] | tuple[str, ...]) -> list[str]:
+    def _normalise_query(
+        self,
+        raw_terms: list[str] | tuple[str, ...],
+    ) -> list[QueryGroup]:
+        groups: list[QueryGroup] = []
+        seen: set[tuple[str, ...]] = set()
+        for raw_term in raw_terms:
+            tokens = tuple(tokenize(raw_term))
+            if tokens and tokens not in seen:
+                groups.append(QueryGroup(raw=raw_term, tokens=tokens))
+                seen.add(tokens)
+        return groups
+
+    def _flatten_groups(self, groups: list[QueryGroup]) -> list[str]:
         terms: list[str] = []
         seen: set[str] = set()
-        for raw_term in raw_terms:
-            for token in tokenize(raw_term):
+        for group in groups:
+            for token in group.tokens:
                 if token not in seen:
                     terms.append(token)
                     seen.add(token)
         return terms
+
+    def _phrase_counts_for_url(
+        self,
+        groups: list[QueryGroup],
+        url: str,
+        term_data: Mapping[str, Any],
+    ) -> dict[str, int] | None:
+        phrase_counts: dict[str, int] = {}
+        for group in groups:
+            if not group.is_phrase:
+                continue
+
+            count = self._count_phrase_matches(group.tokens, url, term_data)
+            if count == 0:
+                return None
+            phrase_counts[" ".join(group.tokens)] = count
+        return phrase_counts
+
+    def _count_phrase_matches(
+        self,
+        phrase_tokens: tuple[str, ...],
+        url: str,
+        term_data: Mapping[str, Any],
+    ) -> int:
+        first_token, *remaining_tokens = phrase_tokens
+        first_positions = term_data[first_token]["postings"][url]["positions"]
+        remaining_position_sets = [
+            set(term_data[token]["postings"][url]["positions"])
+            for token in remaining_tokens
+        ]
+
+        matches = 0
+        for start_position in first_positions:
+            if all(
+                start_position + offset + 1 in positions
+                for offset, positions in enumerate(remaining_position_sets)
+            ):
+                matches += 1
+        return matches
 
     def _require_index(self) -> Mapping[str, Any]:
         if self.index is None:
@@ -145,4 +216,3 @@ def format_results(results: list[SearchResult]) -> str:
             f"   Score: {result.score:.4f}; frequencies: {frequencies}"
         )
     return "\n".join(lines)
-

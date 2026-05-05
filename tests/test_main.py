@@ -44,6 +44,11 @@ def test_build_command_saves_index_without_network(monkeypatch, tmp_path) -> Non
     assert "Built index for 1 pages" in output
     assert "Failed URLs: 1" in output
     assert (tmp_path / "index.json").exists()
+    loaded = cli.engine.index
+    assert loaded is not None
+    assert loaded["metadata"]["crawler_strategy"] == "breadth-first search"
+    assert loaded["metadata"]["politeness_window_seconds"] == 6.0
+    assert loaded["metadata"]["failed_urls"] == FakeCrawler.failed_urls
 
 
 def test_build_command_validates_arguments_and_empty_crawl(monkeypatch, tmp_path) -> None:
@@ -117,4 +122,3 @@ def test_parse_args_and_main_one_shot(monkeypatch, capsys, tmp_path) -> None:
 
     main()
     assert "Available commands" in capsys.readouterr().out
-

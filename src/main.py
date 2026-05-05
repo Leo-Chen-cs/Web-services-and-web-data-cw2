@@ -90,7 +90,18 @@ class SearchCli:
         if not pages:
             return "No pages were crawled; index was not updated."
 
-        index = build_index(pages)
+        index = build_index(
+            pages,
+            extra_metadata={
+                "base_url": crawler.base_url,
+                "crawler_strategy": "breadth-first search",
+                "politeness_window_seconds": crawler.politeness_window,
+                "visited_urls": sorted(getattr(crawler, "visited_urls", set())),
+                "failed_urls": dict(
+                    sorted(getattr(crawler, "failed_urls", {}).items())
+                ),
+            },
+        )
         save_index(index, self.index_path)
         self.engine.set_index(index)
         failed_count = len(crawler.failed_urls)
