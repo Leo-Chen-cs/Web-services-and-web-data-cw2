@@ -60,7 +60,11 @@ class SearchEngine:
             return []
 
         matching_urls: set[str] | None = None
-        for term in terms:
+        candidate_terms = sorted(
+            terms,
+            key=lambda term: len(term_data[term].get("postings", {})),
+        )
+        for term in candidate_terms:
             urls = set(term_data[term].get("postings", {}))
             matching_urls = urls if matching_urls is None else matching_urls & urls
 
