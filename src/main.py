@@ -112,7 +112,12 @@ class SearchCli:
 
     def _load(self, args: list[str]) -> str:
         path = Path(args[0]) if args else self.index_path
-        index = load_index(path)
+        if not path.exists():
+            return f"Index file not found: {path}. Run 'build' first."
+        try:
+            index = load_index(path)
+        except ValueError as exc:
+            return f"Could not load index: {exc}"
         self.engine.set_index(index)
         document_count = index.get("metadata", {}).get("document_count", "unknown")
         return f"Loaded index from {path} ({document_count} documents)."

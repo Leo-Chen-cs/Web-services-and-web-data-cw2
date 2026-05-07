@@ -87,6 +87,18 @@ def test_find_without_index_returns_clear_message(tmp_path) -> None:
     assert cli.execute("find alpha") == "No index loaded. Run 'build' or 'load' first."
 
 
+def test_load_handles_missing_and_invalid_index_files(tmp_path) -> None:
+    missing_path = tmp_path / "missing.json"
+    invalid_path = tmp_path / "invalid.json"
+    invalid_path.write_text("[]", encoding="utf-8")
+    cli = SearchCli(index_path=missing_path)
+
+    assert cli.execute("load") == (
+        f"Index file not found: {missing_path}. Run 'build' first."
+    )
+    assert cli.execute(f"load {invalid_path}").startswith("Could not load index:")
+
+
 def test_interactive_run_handles_help_then_exit(monkeypatch, capsys, tmp_path) -> None:
     commands = iter(["help", "exit"])
     monkeypatch.setattr(builtins, "input", lambda _prompt: next(commands))
