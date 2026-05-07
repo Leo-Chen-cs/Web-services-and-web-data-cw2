@@ -47,8 +47,8 @@ pytest --cov=src --cov-report=term-missing
 
 Explain that tests cover normal crawl behaviour, duplicate links, error
 recovery, politeness, indexing, positions, single-word search, multi-word search,
-phrase search, missing terms, and CLI edge cases. Mention that GitHub Actions
-runs the same test command automatically.
+phrase search, missing terms, and CLI edge cases. Mention the benchmark script
+for reproducible performance checks.
 
 ## 4:00-4:30 Git
 
@@ -59,7 +59,8 @@ git log --oneline
 ```
 
 Mention the implementation was developed in clear stages: crawler, index/search,
-tests, documentation, and high-scoring extras such as CI and benchmarking notes.
+tests, documentation, and high-scoring extras such as phrase search and
+benchmarking notes.
 
 ## 4:30-5:00 GenAI Reflection
 

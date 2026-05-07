@@ -18,15 +18,12 @@ queries over the saved data.
 - TF-IDF ranking for `find` results
 - Query suggestions for close missing terms
 - Focused `pytest` test suite covering crawler, indexing, search, and CLI logic
-- GitHub Actions workflow for automated test and coverage checks
+- Reproducible benchmark script and complexity analysis notes
 
 ## Project Structure
 
 ```text
 .
-├── .github/
-│   └── workflows/
-│       └── tests.yml
 ├── src/
 │   ├── crawler.py
 │   ├── indexer.py
@@ -136,9 +133,8 @@ pytest --cov=src --cov-report=term-missing
 The tests mock HTTP responses so they are fast, deterministic, and do not make
 network requests.
 
-The repository also includes a GitHub Actions workflow in
-`.github/workflows/tests.yml` that runs the same coverage command on push and
-pull request events.
+For reproducibility, the tests avoid live network access and use mocked crawler
+responses where appropriate.
 
 ## Design Decisions
 
@@ -192,7 +188,8 @@ Keep the final video under five minutes:
 1. Live demo: `build`, `load`, `print`, `find`, missing word, and empty query.
 2. Code walkthrough: crawler politeness, inverted index, phrase queries, and
    TF-IDF ranking.
-3. Testing: run `pytest --cov=src --cov-report=term-missing` and mention CI.
+3. Testing: run `pytest --cov=src --cov-report=term-missing` and mention the
+   benchmark script.
 4. Git: show meaningful commits and explain the development order.
 5. GenAI reflection: state the tools used, how they helped, where they were
    wrong or incomplete, and what you learned by checking the generated code.
@@ -207,7 +204,7 @@ normalisation, the politeness window, and the inverted-index structure.
 
 The final implementation also includes manual improvements beyond generated
 drafts, including testable politeness-window injection, exact phrase matching
-using token positions, CI configuration, and benchmark documentation.
+using token positions, and benchmark documentation.
 
 ## References
 
